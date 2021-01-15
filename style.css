@@ -1,0 +1,16 @@
+path:hover {
+    fill: darkblue;
+}
+#barchart {
+    position: relative;
+}
+.container {
+    position: absolute;
+    left: calc(50% - 330px);
+    height: 400px;
+    width: 100%;
+}
+#selection {
+    display: flex;
+    justify-content: center;
+}
