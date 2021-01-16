@@ -2,6 +2,8 @@ import nlMap from './nlMap.js'
 
 export async function drawMapVisu() {
     const nlData = await nlMap()
+    const dashboardURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRWbcLP_nYqgbSj8ONiIay7HSmAlW37PMCUFW607PiLilUpPTOYAwzyFEXQOrgUdJwXx6mlaMN9PEvw/pub?gid=1884793021&single=true&output=csv"
+
     const path = d3.geoPath()
 
     const width = 975;
@@ -11,6 +13,8 @@ export async function drawMapVisu() {
     .append('svg')
     .attr("viewBox", [0, 0, width, height])
 
+    
+
     const g = svg.append('g')
 
     const projection = d3.geoMercator().scale(5000).center([5.1, 52])
@@ -19,7 +23,7 @@ export async function drawMapVisu() {
     const provincies = g
     .append('g')
     
-    .attr('fill', '#42428f')
+    .attr('fill', '#E3E6CA')
     .attr('stroke', '#2c2c2e')
     .attr("stroke-width", .7)
     .selectAll('path')
@@ -28,39 +32,27 @@ export async function drawMapVisu() {
     .join('path')
     .attr('class', 'provincie')
     .attr('d', pathGenerator)
-    .append('title')
-    .text()
-    
-    const dashboardURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRWbcLP_nYqgbSj8ONiIay7HSmAlW37PMCUFW607PiLilUpPTOYAwzyFEXQOrgUdJwXx6mlaMN9PEvw/pub?gid=1884793021&single=true&output=csv"
 
+    
+    
     async function fetch(url) {
         const data = await d3.csv(url);
         return data;
     }
-
  makeBarChart()
 
  async function makeBarChart() {
     const deData = await fetch(dashboardURL)
+    .then(dt => dt.map(d => ({...d, geo: d.geo.replace("North Brabant", "Noord-Brabant")})))
+
     const xValuePartij = deData.map(function(d) { return d.partij })
     const xValueGender = deData.map(function(d) { return d.gender })
 
     const margin = {top: 50, bottom: 20, left: 40, right: 20}
-    const xScalePartij = d3.scaleBand()
-                     .domain(xValuePartij)
-                     .rangeRound([0, 600])
-                     .padding(0.1)
-    const xScaleGender = d3.scaleBand()
-                     .domain(xValueGender)
-                     .rangeRound([0, xScalePartij.bandwidth()])
-                     .padding(0.1)
-    const yScale = d3.scaleLinear()
-                     .domain([0,10])
-                     .range([300,0])
 
     let manData = []
     let vrouwData = []
-    
+
     const cleanedData = deData.map(d => {
                         if(isNaN(d["percentage totaal"])) {
                             d["percentage totaal"] = +d["percentage totaal"].toString().replace(/,/g,".")
@@ -81,74 +73,91 @@ export async function drawMapVisu() {
                          }
                      })
 
-    const xAxis = d3.axisBottom(xScalePartij)
-                    
-    const yAxis = d3.axisLeft(yScale)
-                    .tickSize(-600)
-                    .tickFormat(function(d){return d+ "%"})
-    
-    
     const container = d3.select('#barchart')
-        .append('svg')
-        .classed('container', true)
-        .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`)
+                     .append('svg')
+                     .classed('container', true)
+                     .append('g')
+                     .attr('transform', `translate(${margin.left},${margin.top})`)
+                     
+    const txt = container.append("text")
+                     .attr("x", (width / 3.3))             
+                     .attr("y", -30 )
+                     .attr("text-anchor", "middle")  
+                     .style("font-size", "30px") 
+                     .style("text-decoration", "underline")  
+                     .text("Kies een provincie!");
     
+    const xScalePartij = d3.scaleBand()
+                     .domain(xValuePartij)
+                     .rangeRound([0, 600])
+                     .padding(0.1)
+    const xScaleGender = d3.scaleBand()
+                     .domain(xValueGender)
+                     .rangeRound([0, xScalePartij.bandwidth()])
+                     .padding(0.1)
+                     
+    let yScale = d3.scaleLinear()
+                     .domain([0, 10])
+                     .range([300,0])
+
+    let yAxis = d3.axisLeft(yScale)
+                     .tickSize(-600)
+                     .tickFormat(function(d){return d+ "%"})
+
     const yAxisG = container.append('g').call(yAxis)
+
+    const xAxis = d3.axisBottom(xScalePartij)
+
+    const xAxisG = container.append('g')
+                            .call(xAxis)
+                            .attr('transform', `translate(0,300)`)
+                            .selectAll('.tick line')
+                            .remove()  
+
     
-    const xAxisG = container.append('g').call(xAxis)
-                 .attr('transform', `translate(0,300)`)
-        
-    
-        xAxisG.selectAll('.tick line').remove()  
-    
-    
-    
-        container.append('text')
-                 .classed('title', true)
-                 .attr('x', -8)
-                 .attr('y', -20)
     
     const selectOption = document.getElementById("select")
     
-   
-    let provincieSelectie
+                      
+    let ageGrp = selectOption.value, province;
     
-
-    g.selectAll('.provincie').on('click', clicked)
-   
-    makeBar(selectOption.value, "Drenthe")
-
-
-    function myFunc() {return provincieSelectie}
-    selectOption.addEventListener('change', (e) => {
-        
-        makeBar(selectOption.value, myFunc())
+    g.selectAll('.provincie').on('click', (d) => {
+        province = d.properties.statnaam;
+        makeBar(ageGrp, province)
+        txt.text(province);
     })
 
-    function clicked (d) {
+    selectOption.addEventListener('change', (e) => {
+        ageGrp = selectOption.value;
+        makeBar(ageGrp, province)
+        
+    })
 
-        provincieSelectie = d.properties.statnaam
-        myFunc()
-    }
     function makeBar(selectedAge, selectedProvincie) {
         
         function filterArray (d) {
-            
             if (d.age == selectedAge && d.geo == selectedProvincie) {
-                return d
+                return d;
             }
         } 
 
         var newManArray = manData.filter(filterArray)
         var newWomanArray = vrouwData.filter(filterArray)
 
-        console.log(newManArray)
+        const values = newManArray.map(d => d.man).concat(newWomanArray.map(d => d.vrouw));
+
+        yScale.domain([0, d3.max(values)])
+        yAxis = d3.axisLeft(yScale)
+                  .tickSize(-600)
+                  .tickFormat(function(d){return d+ "%"})
+        yAxisG.call(yAxis)
+
         const rectMale = container.selectAll('.man').data(newManArray)
+
      container
         .selectAll('.man').transition().duration(1000)
         .attr('y', d => yScale(d.man))
-        .attr('height', d => 300 - yScale(d.man))
+        .attr('height', d =>300 - yScale(d.man))
         rectMale.enter()
         .append('rect')
         .attr('class', 'man')

@@ -1,5 +1,5 @@
-path:hover {
-    fill: darkblue;
+.provincie:hover {
+    fill: rgb(226, 216, 121);
 }
 #barchart {
     position: relative;
