@@ -43,6 +43,7 @@ export async function drawMapVisu() {
 
  async function makeBarChart() {
     const deData = await fetch(dashboardURL)
+    
     .then(dt => dt.map(d => ({...d, geo: d.geo.replace("North Brabant", "Noord-Brabant")})))
 
     const xValuePartij = deData.map(function(d) { return d.partij })
@@ -144,9 +145,9 @@ export async function drawMapVisu() {
         var newManArray = manData.filter(filterArray)
         var newWomanArray = vrouwData.filter(filterArray)
 
-        const values = newManArray.map(d => d.man).concat(newWomanArray.map(d => d.vrouw));
-
-        yScale.domain([0, d3.max(values)])
+        const max = d3.max(newManArray.map(d => d.man).concat(newWomanArray.map(d => d.vrouw)))
+        
+        yScale.domain([0, max + (max * 0.10)])
         yAxis = d3.axisLeft(yScale)
                   .tickSize(-600)
                   .tickFormat(function(d){return d+ "%"})
