@@ -1,19 +1,45 @@
-// document.getElementById("imgTop").src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABU8AAAOHCAYAAAAXMLKAAAAAAXNSR0IArs4c6QAAIABJREFUeJzs3XV4VFfixvHvWGQmbgQJwQIElyDB3aVQodBtKVS2bnS3vr+6r1W37ZZ6C5RSXAu0JDgBihSX4CGBuM/M/f0RGAiZAEXb7ft5njzPzLn3nHvOzISQN+ecazIMw0BERERERERERETkf1BOTs4F1zVfwn6IiIiIiIiIiIiI/M9QeCoiIiIiIiIiIiLihcJTERERERERERERES8UnoqIiIiIiIiIiIh4ofBURERERERERERExAuFpyIiIiIiIiIiIvKHNH369LMeV3gqIiIiIiIiIiIifzgng9OzBagKT0VEREREREREROQP5czAtLIAVeGpiIiIiIiIiIiI/GFUFpR6KzcZhmFc7g6JiIiIiIiIiIiIXA05OTkXXFczT0VERERERERERES8UHgqIiIiIi"
-// document.getElementById("imgMedium").src = "https://i.gyazo.com/0e4233465a7277830a16f7dfc37274e4.png"
-// document.getElementById("imgBottom").src = "https://i.gyazo.com/8496ad59756cb594ac77e71653e85c33.png"
-const dashboard = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTZSWZpkDtvHozk5Ni-jSdJBQXo96isHUsrig-n3yph5GVJRv8CZw2yw4DBSJ_P87TnXqsHYHkVhsYD/pub?gid=966467927&single=true&output=csv"
+// document.getElementById("imgFvD").src = "https://staging.followthemoney.nl/uploads/media/600012280d7bd/50plus-fb.png"
+// document.getElementById("imgPvdA").src = "https://i.gyazo.com/0e4233465a7277830a16f7dfc37274e4.png"
+// document.getElementById("imgCDA").src = "https://i.gyazo.com/8496ad59756cb594ac77e71653e85c33.png"
+// document.getElementById("img50").src = "https://staging.followthemoney.nl/uploads/media/600012280d7bd/50plus-fb.png"
+// document.getElementById("imgCU").src = "https://i.gyazo.com/0e4233465a7277830a16f7dfc37274e4.png"
+// document.getElementById("imgSP").src = "https://i.gyazo.com/8496ad59756cb594ac77e71653e85c33.png"
+// document.getElementById("imgSGP").src = "https://staging.followthemoney.nl/uploads/media/600012280d7bd/50plus-fb.png"
+// document.getElementById("imgGroenlinks").src = "https://i.gyazo.com/0e4233465a7277830a16f7dfc37274e4.png"
+// document.getElementById("imgDenk").src = "https://i.gyazo.com/8496ad59756cb594ac77e71653e85c33.png"
 
-// async function fetch(url) {
-//     const data = await d3.csv(url);
-//     return data;
-// }
 
-// make()
+const data = d3.csv('./Screen.csv')
+async function fetch(url) {
+    return url
+}
 
-// async function make() {
-//     const dat = await fetch(dashboard)
-//     const face = dat.map(d => d.Facebook) 
-//     document.getElementById("imgTop").src = face[10]
+make()
 
-//     return dat
-// }
+async function make() {
+
+    const dat = await fetch(data)
+    const face = dat.map(d => d.ad_snapshot_url) 
+    const weergaven = dat.map(d => d["Weergaven mid"])
+
+    document.getElementById("imgFvD").src = face[5]
+    document.getElementById("imgPvdA").src = face[7]
+    document.getElementById("imgCDA").src = face[1]
+    document.getElementById("img50").src = face[0]
+    document.getElementById("imgCU").src = face[2]
+    document.getElementById("imgSP").src = face[9]
+    document.getElementById("imgSGP").src = face[8]
+    document.getElementById("imgGroen").src = face[6] 
+    document.getElementById("imgDenk").src = face[4]
+
+    document.getElementById("weergavenFvD").textContent = "FvD: " + weergaven[5] + " weergaven"
+    document.getElementById("weergavenPvdA").textContent = "PvdA: " + weergaven[7] + " weergaven"
+    document.getElementById("weergavenCDA").textContent = "CDA: " + weergaven[1] + " weergaven"
+    document.getElementById("weergaven50").textContent = "50Plus: " + weergaven[0] + " weergaven"
+    document.getElementById("weergavenCU").textContent = "CU: " + weergaven[2] + " weergaven"
+    document.getElementById("weergavenSP").textContent = "SP: " + weergaven[9] + " weergaven"
+    document.getElementById("weergavenSGP").textContent = "SGP: " + weergaven[8] + " weergaven"
+    document.getElementById("weergavenGroen").textContent = "Groenlinks: " + weergaven[6] + " weergaven"
+    document.getElementById("weergavenDenk").textContent = "Denk: " + weergaven[4] + " weergaven"
+
+}

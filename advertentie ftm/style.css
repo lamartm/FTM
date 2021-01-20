@@ -8,11 +8,13 @@
 }
 .ad {
     width: 350px;
-    height: 370px;
+    height: 500px;
 }
 img {
     width: 350px;
-    height: 370px;
+    height: 500px;
+
+    object-fit:cover;
 }
 .text {
     height: 70px;
